@@ -1,11 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Runtime.Remoting.Messaging;
 
-namespace sub_GPIB
+namespace sub_Stokes2Jones
 {
     static class Utility
     {
-        //---------------------- For testing ------------------------------------------------------------------------------------------------//
-
+        #region For testing
         public static string text_S0 = "VAL00  77.204;VAL01  16.427;VAL02   0.295;VAL03  39.486;VAL04   0.371;VAL05   0.121;VAL06  56.222;VAL07   0.000;VAL08  10.609;VAL09  -0.758;VAL10   0.363;VAL11   0.543;VAL12 -75.284;VAL13 -71.248;VAL14 -73.429;1000;E08\n";
 
         public static string text_SB = "S1  0.849;S2  0.528;S3  0.007;PDB -76.34;1000;E00\n";
@@ -18,8 +19,8 @@ namespace sub_GPIB
         public static string text_J1 = "J[11]  0.870  7.368;J[12]  0.557 -138.518;J[21]  0.646 -39.584;J[22]  0.736 -8.434;1000;E00\n";
         //1551.00 
         public static string text_J2 = "J[11]  0.797 -64.374;J[12]  0.605 -66.324;J[21]  0.600 -111.640;J[22]  0.799 63.215;1000;E00\n";
+        #endregion
 
-        //-----------------------------------------------------------------------------------------------------------------------------------//
         public static string ReplaceCommonEscapeSequences(string s)
         {
             return s.Replace("\\n", "\n").Replace("\\r", "\r");
@@ -72,7 +73,7 @@ namespace sub_GPIB
         {
             double[] stokes = new double[4];
 
-            for(int i = 0; i < 4; i++)
+            for (int i = 0; i < 4; i++)
             {
                 stokes[i] = System.Convert.ToDouble(values[i]);
             }
@@ -85,9 +86,59 @@ namespace sub_GPIB
             return SB_String2Double(SB_filter(DataSeparator(text)));
         }// S1, S2, S3, PDB
 
+        public static ComplexCar Stokes2K(double s1, double s2, double s3, double s0 = 1)
+        {
+            ComplexCar complexCar = new ComplexCar();
+
+            double r = Math.Sqrt((s0 + s1) / (s0 - s1));
+            double theta = -1 * Math.Atan(s3 / s2);
+
+            complexCar.real = r * Math.Cos(theta);
+            complexCar.imag = r * Math.Sin(theta);
+
+            return complexCar;
+        }
+
+        public static JonesMatCar K2JonesMat(ComplexCar k0,ComplexCar k90,ComplexCar k45)
+        {
+            JonesMatCar jonesMatCar = new JonesMatCar();
+
+            ComplexCar k4 = (k90 - k45) / (k45 - k0);
+
+            jonesMatCar.J11 = k0 * k4;
+            jonesMatCar.J12 = k90;
+            jonesMatCar.J21 = k4;
+            jonesMatCar.J22 = new ComplexCar(1, 0);
+
+            return jonesMatCar;
+        }
+
         private static double Wavelength2Frequency(double wavelength)//wavelength in nm and frequency in THz
         {
             return C / (wavelength * 1000);
+        }
+
+        public static double[] DGD(JonesMatCar J1, JonesMatCar J2, double w1, double w2)
+        {
+            JonesMatCar J1Inv = CMath.Inverse(J1);
+
+            JonesMatCar J2_J1Inv = J2 * J1Inv;
+
+            ComplexCar[] complexCars = CMath.Eigenvalues(J2_J1Inv);
+
+            ComplexPol[] complexPols = new ComplexPol[2];
+
+            complexPols[0] = CMath.Car2Pol(complexCars[0]);
+            complexPols[1] = CMath.Car2Pol(complexCars[1]);
+
+            double Ang = complexPols[0].ang - complexPols[1].ang;
+
+            double f1 = Wavelength2Frequency(w1);
+            double f2 = Wavelength2Frequency(w2);
+
+            double[] DGD_WL = { CMath.Abs(Ang / (f1 - f2)), (w1 + w2) / 2 };
+
+            return DGD_WL;
         }
     }
 }

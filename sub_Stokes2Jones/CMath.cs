@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace sub_GPIB
+namespace sub_Stokes2Jones
 {
     struct ComplexCar
     {
