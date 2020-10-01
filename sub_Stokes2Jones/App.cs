@@ -27,13 +27,12 @@ namespace sub_Stokes2Jones
             return "POS " + theta.ToString() + ";X;";
         }
 
-        static void InitDGDMesure(Device Source, Device PolarizationAnalyzer, double start, double power)
+
+        static void InitMesure(Device Source, double power = 1200)
         {
-            Source.Write(Utility.ReplaceCommonEscapeSequences(MsgPowerSrc(power))); // set power to 1000uW
+            Source.Write(Utility.ReplaceCommonEscapeSequences(MsgPowerSrc(power))); // set power to 1200uW
             Source.Write(Utility.ReplaceCommonEscapeSequences(":OUTPut 1")); // turn on the laser
-            Console.WriteLine("Set Source  WL - " + start.ToString());
-            Source.Write(Utility.ReplaceCommonEscapeSequences(MsgWaveLenghtSrc(start)));//change wavelength source
-            //PolarizationAnalyzer.Write(Utility.ReplaceCommonEscapeSequences("PO;X;"));//Optimizing the polarizer position in the module
+            Console.WriteLine("Laser is ON !");
         }
 
         static ComplexCar KMesure(Device PolarizationAnalyzer, double polPos, int polDelay = 1)
@@ -70,6 +69,12 @@ namespace sub_Stokes2Jones
             return Utility.K2JonesMat(k0, k90, k45);
         }
 
+        static void Done(Device Source)
+        {
+            Source.Write(Utility.ReplaceCommonEscapeSequences(":OUTPut 0")); // turn off the laser
+            Console.WriteLine("Laser is OFF !");
+        }
+
         static void Mesure()
         {
             Device PolarizationAnalyzer = new Device(0, 9, 0);
@@ -97,7 +102,7 @@ namespace sub_Stokes2Jones
 
             int delay = 1000;
 
-            InitDGDMesure(Source, PolarizationAnalyzer, start, 1200);
+            InitMesure(Source);
 
             for (int i = 0; i < steps; i++)
             {
@@ -109,7 +114,7 @@ namespace sub_Stokes2Jones
                 {
                     jMat[i] = MesureJonesMat(Source, PolarizationAnalyzer, wavelenght[i], delay);
 
-                    DGDval = Utility.DGD(jMat[i - 2], jMat[i], wavelenght[i - 2], wavelenght[i]);//put jString here
+                    DGDval = Utility.DGD(jMat[i - 2], jMat[i], wavelenght[i - 2], wavelenght[i]);
                     DGDs[i - 2, 0] = DGDval[0];
                     DGDs[i - 2, 1] = DGDval[1];
 
@@ -119,7 +124,7 @@ namespace sub_Stokes2Jones
                 }
             }
 
-            Source.Write(Utility.ReplaceCommonEscapeSequences(":OUTPut 0")); // turn off the laser
+            Done(Source); // turn off the laser
 
 
             PolarizationAnalyzer.Dispose();
@@ -129,15 +134,7 @@ namespace sub_Stokes2Jones
 
         static void Main(string[] args)
         {
-            double[] stokes = Utility.SB2Stokes(Utility.text_SB);
-
-            ComplexCar k0 = Utility.Stokes2K(stokes[0], stokes[1], stokes[2]);
-            ComplexCar k90 = Utility.Stokes2K(stokes[0], stokes[1], stokes[2]);
-            ComplexCar k45 = Utility.Stokes2K(stokes[0], stokes[1], stokes[2]);
-
-            JonesMatCar jonesMat = Utility.K2JonesMat(k0, k90, k45);
-
-            CMath.Print(jonesMat);
+            Mesure();
 
             Console.Read();
         }
