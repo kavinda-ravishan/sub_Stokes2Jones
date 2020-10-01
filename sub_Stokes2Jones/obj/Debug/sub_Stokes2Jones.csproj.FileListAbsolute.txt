@@ -1,0 +1,13 @@
+C:\Users\Kavinda Ravishan\source\repos\kavinda-ravishan\sub_Stokes2Jones\sub_Stokes2Jones\bin\Debug\sub_Stokes2Jones.exe.config
+C:\Users\Kavinda Ravishan\source\repos\kavinda-ravishan\sub_Stokes2Jones\sub_Stokes2Jones\bin\Debug\sub_Stokes2Jones.exe
+C:\Users\Kavinda Ravishan\source\repos\kavinda-ravishan\sub_Stokes2Jones\sub_Stokes2Jones\bin\Debug\sub_Stokes2Jones.pdb
+C:\Users\Kavinda Ravishan\source\repos\kavinda-ravishan\sub_Stokes2Jones\sub_Stokes2Jones\bin\Debug\NationalInstruments.Common.dll
+C:\Users\Kavinda Ravishan\source\repos\kavinda-ravishan\sub_Stokes2Jones\sub_Stokes2Jones\bin\Debug\NationalInstruments.NI4882.dll
+C:\Users\Kavinda Ravishan\source\repos\kavinda-ravishan\sub_Stokes2Jones\sub_Stokes2Jones\bin\Debug\NationalInstruments.Common.xml
+C:\Users\Kavinda Ravishan\source\repos\kavinda-ravishan\sub_Stokes2Jones\sub_Stokes2Jones\bin\Debug\NationalInstruments.NI4882.xml
+C:\Users\Kavinda Ravishan\source\repos\kavinda-ravishan\sub_Stokes2Jones\sub_Stokes2Jones\obj\Debug\sub_Stokes2Jones.csprojAssemblyReference.cache
+C:\Users\Kavinda Ravishan\source\repos\kavinda-ravishan\sub_Stokes2Jones\sub_Stokes2Jones\obj\Debug\sub_Stokes2Jones.exe.config
+C:\Users\Kavinda Ravishan\source\repos\kavinda-ravishan\sub_Stokes2Jones\sub_Stokes2Jones\obj\Debug\sub_Stokes2Jones.csproj.CoreCompileInputs.cache
+C:\Users\Kavinda Ravishan\source\repos\kavinda-ravishan\sub_Stokes2Jones\sub_Stokes2Jones\obj\Debug\sub_Stokes2Jones.csproj.CopyComplete
+C:\Users\Kavinda Ravishan\source\repos\kavinda-ravishan\sub_Stokes2Jones\sub_Stokes2Jones\obj\Debug\sub_Stokes2Jones.exe
+C:\Users\Kavinda Ravishan\source\repos\kavinda-ravishan\sub_Stokes2Jones\sub_Stokes2Jones\obj\Debug\sub_Stokes2Jones.pdb
