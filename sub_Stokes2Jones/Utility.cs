@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Runtime.Remoting.Messaging;
 
 namespace sub_Stokes2Jones
 {
@@ -17,7 +16,7 @@ namespace sub_Stokes2Jones
 
         //1550.00 nm
         public static string text_J1 = "J[11]  0.870  7.368;J[12]  0.557 -138.518;J[21]  0.646 -39.584;J[22]  0.736 -8.434;1000;E00\n";
-        //1551.00 
+        //1551.00 nm
         public static string text_J2 = "J[11]  0.797 -64.374;J[12]  0.605 -66.324;J[21]  0.600 -111.640;J[22]  0.799 63.215;1000;E00\n";
         #endregion
 
@@ -30,9 +29,9 @@ namespace sub_Stokes2Jones
             return s.Replace("\n", "\\n").Replace("\r", "\\r");
         }
 
-        private const double C = 299792458;
+        public const double C = 299792458;
 
-        private static List<string> DataSeparator(string text)
+        public static List<string> DataSeparator(string text)
         {
             List<string> info = new List<string>();
             string value = "";
@@ -53,7 +52,7 @@ namespace sub_Stokes2Jones
             return info;
         }
 
-        private static string[] SB_filter(List<string> text)
+        public static string[] SB_filter(List<string> text)
         {
             string[] SB = new string[6];
 
@@ -69,7 +68,36 @@ namespace sub_Stokes2Jones
             return SB;
         }
 
-        private static double[] SB_String2Double(string[] values)
+        public static string[] S0_filter(List<string> text)
+        {
+            string[] S0 = new string[17];
+
+            for (int i = 0; i < 15; i++)
+            {
+                S0[i] = text[i].Substring(5);
+            }
+            S0[15] = text[15];
+            S0[16] = text[16].Substring(0, 3);
+
+            return S0;
+        }
+
+        public static string[] JM_filter(List<string> text)
+        {
+            string[] JMat = new string[10];
+
+            for (int i = 0; i < 4; i++)
+            {
+                JMat[i * 2] = text[i].Substring(5, 7);
+                JMat[(i * 2) + 1] = text[i].Substring(12, 7);
+            }
+            JMat[8] = text[4];
+            JMat[9] = text[5].Substring(0, 3);
+
+            return JMat;
+        }
+
+        public static double[] SB_String2Double(string[] values)
         {
             double[] stokes = new double[4];
 
@@ -81,10 +109,44 @@ namespace sub_Stokes2Jones
             return stokes;
         }
 
+        public static double[] S0_String2Double(string[] values)
+        {
+            double[] S0 = new double[15];
+
+            for (int i = 0; i < 15; i++)
+            {
+                S0[i] = System.Convert.ToDouble(values[i]);
+            }
+
+            return S0;
+        }
+
+        public static double[] JM_String2Double(string[] values)
+        {
+            double[] JM = new double[8];
+
+            for (int i = 0; i < 8; i++)
+            {
+                JM[i] = System.Convert.ToDouble(values[i]);
+            }
+
+            return JM;
+        }
+
         public static double[] SB2Stokes(string text)
         {
             return SB_String2Double(SB_filter(DataSeparator(text)));
         }// S1, S2, S3, PDB
+
+        public static double[] S02PrimaryMeasurements(string text)
+        {
+            return S0_String2Double(S0_filter(DataSeparator(text)));
+        }
+
+        public static double[] JM2JonesMatValues(string text)
+        {
+            return JM_String2Double(JM_filter(DataSeparator(text)));
+        }
 
         public static ComplexCar Stokes2K(double s1, double s2, double s3, double s0 = 1)
         {

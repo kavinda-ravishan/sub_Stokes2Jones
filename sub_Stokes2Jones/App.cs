@@ -1,5 +1,6 @@
 ﻿using NationalInstruments.NI4882;
 using System;
+using System.Collections.Generic;
 
 namespace sub_Stokes2Jones
 {
@@ -28,14 +29,17 @@ namespace sub_Stokes2Jones
         }
 
 
-        static void InitMesure(Device Source, double power = 1200)
+        static void InitMesure(Device Source, Device PolarizationAnalyzer, double power = 1000)
         {
             Source.Write(Utility.ReplaceCommonEscapeSequences(MsgPowerSrc(power))); // set power to 1200uW
             Source.Write(Utility.ReplaceCommonEscapeSequences(":OUTPut 1")); // turn on the laser
             Console.WriteLine("Laser is ON !");
+
+            PolarizationAnalyzer.Write(Utility.ReplaceCommonEscapeSequences("R 8;X;"));
+            PolarizationAnalyzer.Write(Utility.ReplaceCommonEscapeSequences("A 8;X;"));
         }
 
-        static ComplexCar KMesure(Device PolarizationAnalyzer, double polPos, int polDelay = 1)
+        static ComplexCar KMesure(Device PolarizationAnalyzer, double polPos, int polDelay = 3000)
         {
             Console.WriteLine("Set Polarizer to - " + polPos.ToString());
             PolarizationAnalyzer.Write(Utility.ReplaceCommonEscapeSequences(MsgPolPosition(polPos)));//change pol position
@@ -81,7 +85,7 @@ namespace sub_Stokes2Jones
             Device Source = new Device(0, 24, 0);
 
             double start = 1550;
-            double end = 1553;
+            double end = 1560;
             double stepSize = 1;
 
             int steps = (int)((end - start) / stepSize) + 3;
@@ -100,9 +104,9 @@ namespace sub_Stokes2Jones
             double[] DGDval = new double[2];
             double[,] DGDs = new double[steps - 2, 2];
 
-            int delay = 1000;
+            int delay = 5000;
 
-            InitMesure(Source);
+            InitMesure(Source, PolarizationAnalyzer);
 
             for (int i = 0; i < steps; i++)
             {
@@ -134,7 +138,15 @@ namespace sub_Stokes2Jones
 
         static void Main(string[] args)
         {
-            Mesure();
+            //Mesure();
+
+
+            double[] values = Utility.JM2JonesMatValues(Utility.text_J1);
+
+            for (int i = 0; i < values.Length; i++)
+            {
+                Console.WriteLine(values[i]);
+            }
 
             Console.Read();
         }
