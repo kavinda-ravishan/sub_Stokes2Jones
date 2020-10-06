@@ -202,7 +202,7 @@ namespace sub_Stokes2Jones
             return complexCar;
         }
 
-        public static ComplexCar TanPiDelta2K(double tanPi, double delta)//tanPi in deg
+        public static ComplexCar TanPiDelta2K(double delta, double tanPi)//Delta in deg
         {
             ComplexCar complexCar = new ComplexCar();
 

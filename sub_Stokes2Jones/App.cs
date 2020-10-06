@@ -40,7 +40,7 @@ namespace sub_Stokes2Jones
             PolarizationAnalyzer.Write(Utility.ReplaceCommonEscapeSequences("A 8;X;"));
         }
 
-        static ComplexCar KMesure(Device PolarizationAnalyzer, double polPos, int polDelay = 3000)
+        static ComplexCar Stokes2KMesure(Device PolarizationAnalyzer, double polPos, int polDelay = 3000)
         {
             Console.WriteLine("Set Polarizer to - " + polPos.ToString());
             PolarizationAnalyzer.Write(Utility.ReplaceCommonEscapeSequences(MsgPolPosition(polPos)));//change pol position
@@ -56,7 +56,23 @@ namespace sub_Stokes2Jones
             return Utility.Stokes2K(stokes[0], stokes[1], stokes[2]);
         }
 
-        static JonesMatCar MesureJonesMat(Device Source, Device PolarizationAnalyzer, double wavelenght, int delay)
+        static ComplexCar TanPiDelta2KMesure(Device PolarizationAnalyzer, double polPos, int polDelay = 3000)
+        {
+            Console.WriteLine("Set Polarizer to - " + polPos.ToString());
+            PolarizationAnalyzer.Write(Utility.ReplaceCommonEscapeSequences(MsgPolPosition(polPos)));//change pol position
+
+            System.Threading.Thread.Sleep(polDelay);
+
+            Console.WriteLine("Read SC at - " + polPos.ToString());
+            PolarizationAnalyzer.Write(Utility.ReplaceCommonEscapeSequences("SC;"));
+
+            string TanPiDeltaString = Utility.InsertCommonEscapeSequences(PolarizationAnalyzer.ReadString());//read Stokes
+            double[] TanPiDelta = Utility.SC2EybyExDelta(TanPiDeltaString);
+
+            return Utility.TanPiDelta2K(TanPiDelta[1], TanPiDelta[2]);
+        }
+
+        static JonesMatCar MesureStokes2JonesMat(Device Source, Device PolarizationAnalyzer, double wavelenght, int delay)
         {
             Console.WriteLine("Set Source  WL - " + wavelenght.ToString());
             Source.Write(Utility.ReplaceCommonEscapeSequences(MsgWaveLenghtSrc(wavelenght)));//change wavelength source
@@ -65,9 +81,27 @@ namespace sub_Stokes2Jones
             PolarizationAnalyzer.Write(Utility.ReplaceCommonEscapeSequences(MsgWaveLenghtPol(wavelenght)));//change wavelength pol
             System.Threading.Thread.Sleep(delay);
 
-            ComplexCar k0 = KMesure(PolarizationAnalyzer, 0);
-            ComplexCar k45 = KMesure(PolarizationAnalyzer, 45);
-            ComplexCar k90 = KMesure(PolarizationAnalyzer, 90);
+            ComplexCar k0 = Stokes2KMesure(PolarizationAnalyzer, 0);
+            ComplexCar k45 = Stokes2KMesure(PolarizationAnalyzer, 45);
+            ComplexCar k90 = Stokes2KMesure(PolarizationAnalyzer, 90);
+
+            Console.WriteLine();
+
+            return Utility.K2JonesMat(k0, k90, k45);
+        }
+
+        static JonesMatCar MesurTanPiDelta2JonesMat(Device Source, Device PolarizationAnalyzer, double wavelenght, int delay)
+        {
+            Console.WriteLine("Set Source  WL - " + wavelenght.ToString());
+            Source.Write(Utility.ReplaceCommonEscapeSequences(MsgWaveLenghtSrc(wavelenght)));//change wavelength source
+
+            Console.WriteLine("Set PAT9000 WL - " + wavelenght.ToString());
+            PolarizationAnalyzer.Write(Utility.ReplaceCommonEscapeSequences(MsgWaveLenghtPol(wavelenght)));//change wavelength pol
+            System.Threading.Thread.Sleep(delay);
+
+            ComplexCar k0 = TanPiDelta2KMesure(PolarizationAnalyzer, 0);
+            ComplexCar k45 = TanPiDelta2KMesure(PolarizationAnalyzer, 45);
+            ComplexCar k90 = TanPiDelta2KMesure(PolarizationAnalyzer, 90);
 
             Console.WriteLine();
 
@@ -113,11 +147,11 @@ namespace sub_Stokes2Jones
             {
                 if (i < 2)
                 {
-                    jMat[i] = MesureJonesMat(Source, PolarizationAnalyzer, wavelenght[i], delay);
+                    jMat[i] = MesurTanPiDelta2JonesMat(Source, PolarizationAnalyzer, wavelenght[i], delay);
                 }
                 else
                 {
-                    jMat[i] = MesureJonesMat(Source, PolarizationAnalyzer, wavelenght[i], delay);
+                    jMat[i] = MesurTanPiDelta2JonesMat(Source, PolarizationAnalyzer, wavelenght[i], delay);
 
                     DGDval = Utility.DGD(jMat[i - 2], jMat[i], wavelenght[i - 2], wavelenght[i]);
                     DGDs[i - 2, 0] = DGDval[0];
@@ -139,13 +173,7 @@ namespace sub_Stokes2Jones
 
         static void Main(string[] args)
         {
-            //Mesure();
-            double[] values = Utility.SC2EybyExDelta(Utility.text_SC1);
-
-            for (int i = 0; i < values.Length; i++)
-            {
-                Console.WriteLine(values[i]);
-            }
+            Mesure();
 
             Console.Read();
         }
