@@ -1,6 +1,7 @@
 ﻿using NationalInstruments.NI4882;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace sub_Stokes2Jones
 {
@@ -139,9 +140,7 @@ namespace sub_Stokes2Jones
         static void Main(string[] args)
         {
             //Mesure();
-
-
-            double[] values = Utility.JM2JonesMatValues(Utility.text_J1);
+            double[] values = Utility.SC2EybyExDelta(Utility.text_SC1);
 
             for (int i = 0; i < values.Length; i++)
             {

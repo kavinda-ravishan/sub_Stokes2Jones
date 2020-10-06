@@ -18,6 +18,10 @@ namespace sub_Stokes2Jones
         public static string text_J1 = "J[11]  0.870  7.368;J[12]  0.557 -138.518;J[21]  0.646 -39.584;J[22]  0.736 -8.434;1000;E00\n";
         //1551.00 nm
         public static string text_J2 = "J[11]  0.797 -64.374;J[12]  0.605 -66.324;J[21]  0.600 -111.640;J[22]  0.799 63.215;1000;E00\n";
+
+        public static string text_SC1 = "PSR 0.752;DEL   -9.137;TAN 0.575;PDB -74.55;1000;E00\n";
+        public static string text_SC2 = "PSR 0.449;DEL    4.708;TAN 0.903;PDB -72.50;1000;E00\n";
+        public static string text_SC3 = "PSR 0.714;DEL  170.466;TAN 0.632;PDB -74.29;1000;E00\n";
         #endregion
 
         public static string ReplaceCommonEscapeSequences(string s)
@@ -51,6 +55,7 @@ namespace sub_Stokes2Jones
 
             return info;
         }
+
 
         public static string[] SB_filter(List<string> text)
         {
@@ -97,6 +102,22 @@ namespace sub_Stokes2Jones
             return JMat;
         }
 
+        public static string[] SC_filter(List<string> text)
+        {
+            string[] SC = new string[6];
+
+            for (int i = 0; i < 4; i++)
+            {
+                SC[i] = text[i].Substring(3);
+            }
+
+            SC[4] = text[4];
+            SC[5] = text[5].Substring(0, 3);
+
+            return SC;
+        }
+
+
         public static double[] SB_String2Double(string[] values)
         {
             double[] stokes = new double[4];
@@ -133,6 +154,19 @@ namespace sub_Stokes2Jones
             return JM;
         }
 
+        public static double[] SC_String2Double(string[] values)
+        {
+            double[] SC = new double[4];
+
+            for (int i = 0; i < 4; i++)
+            {
+                SC[i] = System.Convert.ToDouble(values[i]);
+            }
+
+            return SC;
+        }
+
+
         public static double[] SB2Stokes(string text)
         {
             return SB_String2Double(SB_filter(DataSeparator(text)));
@@ -148,12 +182,32 @@ namespace sub_Stokes2Jones
             return JM_String2Double(JM_filter(DataSeparator(text)));
         }
 
+        public static double[] SC2EybyExDelta(string text)
+        {
+            return SC_String2Double(SC_filter(DataSeparator(text)));
+        }
+
+
+
         public static ComplexCar Stokes2K(double s1, double s2, double s3, double s0 = 1)
         {
             ComplexCar complexCar = new ComplexCar();
 
             double r = Math.Sqrt((s0 + s1) / (s0 - s1));
             double theta = -1 * Math.Atan(s3 / s2);
+
+            complexCar.real = r * Math.Cos(theta);
+            complexCar.imag = r * Math.Sin(theta);
+
+            return complexCar;
+        }
+
+        public static ComplexCar TanPiDelta2K(double tanPi, double delta)//tanPi in deg
+        {
+            ComplexCar complexCar = new ComplexCar();
+
+            double r = 1/tanPi;
+            double theta = -1 * CMath.Deg2Red(delta);
 
             complexCar.real = r * Math.Cos(theta);
             complexCar.imag = r * Math.Sin(theta);
@@ -174,6 +228,7 @@ namespace sub_Stokes2Jones
 
             return jonesMatCar;
         }
+
 
         private static double Wavelength2Frequency(double wavelength)//wavelength in nm and frequency in THz
         {
