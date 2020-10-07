@@ -173,7 +173,19 @@ namespace sub_Stokes2Jones
 
         static void Main(string[] args)
         {
-            Mesure();
+            //Mesure();
+
+            double[] values1 = Utility.SC2EybyExDelta(Utility.text_SC1);
+            double[] values2 = Utility.SC2EybyExDelta(Utility.text_SC2);
+            double[] values3 = Utility.SC2EybyExDelta(Utility.text_SC3);
+
+            ComplexCar k1 = Utility.TanPiDelta2K(values1[1], values1[2]);
+            ComplexCar k2 = Utility.TanPiDelta2K(values2[1], values2[2]);
+            ComplexCar k3 = Utility.TanPiDelta2K(values3[1], values3[2]);
+
+            JonesMatCar mat = Utility.K2JonesMat(k1, k2, k3);
+
+            CMath.Print(mat);
 
             Console.Read();
         }

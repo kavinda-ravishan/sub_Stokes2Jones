@@ -160,6 +160,7 @@ namespace sub_Stokes2Jones
 
             for (int i = 0; i < 4; i++)
             {
+                
                 SC[i] = System.Convert.ToDouble(values[i]);
             }
 
